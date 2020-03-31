@@ -120,15 +120,36 @@ li:active{
 #wrapper
 #main-container
 #main-content
+#chat-display{
+    
+}
+
+#wrapper
+#main-container
+#main-content
 #chat-display
 .self-message{
     background-color: #00B4B4;
     color: black;
+    width: fit-content;
     max-width: 40%;
     padding: 12px;
     border-radius: 20px 20px 0 20px;
-    margin-left: 55%;
+    position: relative;
+    margin-left: auto;
+    margin-right: 3%;
+    right: 2px;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.01);
+}
+
+#wrapper
+#main-container
+#main-content
+#chat-display
+.self-name{
+    margin-left: 88%;
+    margin-top: 10px;
+    color: #404b5a;
 }
 
 #wrapper
@@ -139,11 +160,24 @@ li:active{
     background-color:#f1f1f1;
     color: black;
     border-radius: 20px 20px 20px 0;
+    width: fit-content;
     max-width: 40%;
     padding: 12px;
+    position: relative;
+    margin-left: 0;
+    margin-right: auto;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.01);
 }
 
+#wrapper
+#main-container
+#main-content
+#chat-display
+.other-name{
+    margin-left: 5px;
+    margin-top: 10px;
+    color: #404b5a;
+}
 
 #wrapper
 #main-container
@@ -158,20 +192,10 @@ li:active{
 
 #wrapper
 #main-container
-#main-content
-#chat-display
-.other-name{
-    margin-left: 5px;
-    margin-top: 10px;
-    color: #404b5a
-}
-
-#wrapper
-#main-container
 #main-chatbox{
     position: fixed;
     width: 100%;
-    top: 86%;
+    top: 87%;
     padding-top: 15px;
 }
 
@@ -179,8 +203,8 @@ li:active{
 #main-container
 #main-chatbox
 #user-chatbox{
-    width: 400px;
-    height: 30px;
+    width: 35%;
+    height: 10%;
     border-radius: 20px;
     border: none;
     background-color: #d1dde5;
@@ -196,7 +220,7 @@ li:active{
 #wrapper
 #main-container
 #main-chatbox
-.fa-button{
+#user-send{
     margin-left: 10px;
     padding-top: 4px;
     border: none;
@@ -206,7 +230,7 @@ li:active{
 #wrapper
 #main-container
 #main-chatbox
-.fa-button
+#user-send
 .fa-paper-plane{
     font-size: large;
     color: #008989;
