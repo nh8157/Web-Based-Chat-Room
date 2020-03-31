@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Chat Log In</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/index.css">
+        <script src="https://kit.fontawesome.com/f056a69bc8.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="main-container">
+            <div id="main-header">
+                <div id="header">
+                    <h1>Sign In</h1>
+                </div>
+            </div>
+            <div id="main-content">
+                <div id="login-form">
+                    <form action="/index.html" method="POST">
+                        <label for="user-name" class="form-label">Name</label><br>
+                        <div class="textbox-icon">
+                            <input type="text" name="user-name" class="user-input"><i class="fas fa-user" aria-hidden="true"></i><br>
+                        </div>
+                        <label for="user-password" class="form-label">Password</label><br>
+                        <div class="textbox-icon">
+                            <input type="password" name="user-password" class="user-input"><i class="fas fa-lock" aria-hidden="true"></i><br>
+                        </div>
+                        <label for="chat-room" class="form-label">Chat Room</label><br>
+                        <!-- needs to be replaced with better animation -->
+                        <select name="chat-room" class="user-input" placeholder="">
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="Python">Python</option>
+                            <option value="C++">C++</option>
+                            <option value="Create">Create My Own Room</option>
+                        </select><br>
+                        <input type="button" value="Login" id="submit-button"><br>
+                        <!-- <input type="button" value="New User?" id="new-button"> -->
+                    </form>
+                </div>
+            </div>
+            <div id="main-footer"></div>
+        </div>
+    </body>
+</html>

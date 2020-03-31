@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Chat Log In</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/index.css">
+    </head>
+    <body>
+        <div id="main-container">
+            <div id="main-header">
+                <div id="header">
+                    <h1>Account Register</h1>
+                </div>
+            </div>
+            <div id="main-content">
+                <div id="login-form">
+                    <form action="/index.html" method="POST">
+                        <label for="user-name" class="form-label">Name</label><br>
+                        <input type="text" name="user-name" class="user-input"><br>
+                        <label for="user-password" class="form-label">Password</label><br>
+                        <input type="password" name="user-password" class="user-input"><br>
+                        <label for="chat-room" class="form-label">Chat Room</label><br>
+                        <!-- needs to be replaced with better animation -->
+                        <select name="chat-room" class="user-input">
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="Python">Python</option>
+                            <option value="C++">C++</option>
+                        </select><br>
+                        <input type="button" value="Login" id="submit-btn">
+                    </form>
+                </div>
+            </div>
+            <div id="main-footer"></div>
+        </div>
+    </body>
+</html>
