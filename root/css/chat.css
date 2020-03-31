@@ -7,6 +7,11 @@
     list-style: none;
     text-decoration: none;
     font-family: 'Baloo Da 2', cursive;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
 body{
@@ -25,7 +30,7 @@ body{
     position: relative;
     margin-top: 5%;
     width: 60%;
-    height: 700px;
+    height: 88vh;
     border-radius: 15px;
     background-color: #e1e7ec;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
@@ -194,16 +199,17 @@ li:active{
 #main-container
 #main-chatbox{
     position: fixed;
-    width: 100%;
+    width: 43%;
     top: 87%;
     padding-top: 15px;
+    background-color: #e1e7ec;
 }
 
 #wrapper
 #main-container
 #main-chatbox
 #user-chatbox{
-    width: 35%;
+    width: 88%;
     height: 10%;
     border-radius: 20px;
     border: none;
@@ -232,7 +238,7 @@ li:active{
 #main-chatbox
 #user-send
 .fa-paper-plane{
-    font-size: large;
+    font-size: x-large;
     color: #008989;
 }
 
