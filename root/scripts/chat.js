@@ -64,8 +64,6 @@ function msg_display(user, msg){
     const msg_class = user == self ? "self":"other";
     display.innerHTML += `<p class="${msg_class}-message">${msg}</p><h4 class="${msg_class}-name">${user.return_name()}</h4><br>`;
     scrollbar.scrollTop = scrollbar.scrollHeight;
-    console.log(scrollbar.scrollTop);
-    console.log(scrollbar.scrollHeight);
 }
 
 function load_users(){

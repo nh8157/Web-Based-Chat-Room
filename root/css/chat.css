@@ -7,11 +7,7 @@
     list-style: none;
     text-decoration: none;
     font-family: 'Baloo Da 2', cursive;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
+    scroll-behavior: smooth;
 }
 
 body{
@@ -85,6 +81,11 @@ body{
 #main-sidebar
 #content-sidebar
 li{
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     color: #404b5a;
     padding-left: 0px;
     padding-left: 10%;
@@ -246,6 +247,6 @@ li:active{
 #main-container
 #main-chatbox
 .fa-button
-.fa-paper-plane:hover, :active{
+.fa-paper-plane:hover{
     color: #00B4B4;
 }
