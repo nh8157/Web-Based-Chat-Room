@@ -1,28 +1,105 @@
+// <!----------MAIN OOP SECTION---------->
+
+// User object maintains two states
+// When the user is single (default when first joining the system)
+//      this.state=false
+// When the user is in chat (after clicking one user from the navbar)
+//      this.state=true
 class User{
     constructor(username){
         this.username = username;
         this.state = false;
     }
-    join_room(){
+    join_chat(){
         // send a request to the remote server
         // after getting the request
         // alter the state of the user
         this.state_change(true);
     }
-    leave_group(){
+    leave_chat(){
         // no leave option when user is no 
-        this.state_change(this, false);
+        this.state_change(false);
+    }
+    get_state(){
+        return this.state
     }
     state_change(current_state){
         this.state = current_state;
     }
-    return_name(){
+    get_name(){
         return this.username;
     }
 }
+// In single mode, Peers object is loaded with users in the system
+// In chat mode, Peers object is loaded with users in the chat group
+class Peers{
+    constructor(){
+        this.group_members = []
+    }
+    self_join_system(self){
+        if (!self.get_state()){
+            // send requests to server
+            // load the users into the array
+            const user_list = ["Amy", "Tom", "Vivian"];
+            console.log(user_list)
+            this.group_members = user_list;
+            // display the users on the sidebar
+            user_display(this.group_members);
+        }
+    }
+    self_join_chat(self, peer){
+        if (!self.get_state()){
+            // send the name of the peer selected to the server
+            // get the new list of users in the group chat
+            self.join_chat();
+            const user_list = ["Lily", "Tom", "Julia"];
+            user_list.push(self.get_name());
+            this.group_members = user_list;
+            // display the users on the sidebar
+            user_display(this.group_members);
+        } else {
+            // already in chat mode
+            // give user an alert that he's already chatting
+            window.alert("You are already in Chat!");
+        }
+    }
+    self_leave(self){
+        if (self.get_state()){
+            // in chat mode
+            // quit back to single mode
+            self.leave_chat();
+            // get list of users in the system
+            const user_list = ["Tom", "Cindy", "Vivian", "Julia"];
+            this.group_members = user_list;
+            // display the users on the sidebar
+            user_display(this.group_members);
+        }
+    }
+    peer_join(name){
+        // display the new user list
+        this.group_members.push(name);
+        user_display(this.group_members);
+        // sends an alert in group chat
+        notice_display(name, true);
+    }
+    peer_leave(name){
+        this.group_members = this.group_members.filter(() => {
+            return this.group_members != name;
+        }
+        )
+        user_display(this.group_members);
+        notice_display(name, false);
+    }
+}
 
-const self = new User("admin")
+// <!----------MAIN EXECUTION SECTION---------->
 
+const self = new User("admin");
+const peer = new Peers();
+peer.self_join_system(self);
+peer.self_join_chat(self);
+
+// <!----------MAIN SENDING FUNCTION---------->
 const sendbtn = document.getElementById("user-send")
 
 sendbtn.onclick = function (){
@@ -37,17 +114,15 @@ sendbtn.onclick = function (){
         }, 2000);
         console.log("emptymessage");
     }else{
-        // display the message on the screen
-        console.log("here");
-        console.log(msg);
-        msg_display(self, msg);
+        // display only available after server echo
         chatbox.value = "";
         // Here the client also sends the message to the remote server
-
-
+        msg_display(self, msg)
     }
     return false;
 }
+
+// <!----------MAIN RECEIVING FUNCTION---------->
 
 function receive_msg(user){
     // Here the client receives the message from remote server in JSON format
@@ -55,22 +130,42 @@ function receive_msg(user){
     msg_display(user, msg);
 }
 
+// <!----------   UTILITY FUNCTIONS   ---------->
+
 function msg_display(user, msg){
     // display the message and its sender
     // determine if the sender is self
     // user is a class object
     const display = document.getElementById("chat-display");
     const scrollbar = document.getElementById("main-content");
+    const username = user.get_name();
     const msg_class = user == self ? "self":"other";
-    display.innerHTML += `<p class="${msg_class}-message">${msg}</p><h4 class="${msg_class}-name">${user.return_name()}</h4><br>`;
+    display.innerHTML += `<p class="${msg_class}-message">${msg}</p><h4 class="${msg_class}-name">${username}</h4><br>`;
     scrollbar.scrollTop = scrollbar.scrollHeight;
 }
 
-function load_users(){
-    // grabs the current users in the system after logging in
-    // or grabs the users in the group chat
-    // load users on the left column of the webpage
-    // users are class objects
-    // pass
-    users = ["Amy", "Tom", ]
+function user_display(users){
+    // receives an array
+    // display the user's name with fontawesome icon next to it
+    const sidebar = document.getElementById("users-sidebar");
+    users.forEach(user => {
+        sidebar.innerHTML += `<li>${user}</li>`;
+    });
+}
+
+function notice_display(user=false, state=0){
+    // display in the middle the timestamp of the message
+    // display in the middle of the chat that the user has left/joined the chat 
+    const display = document.getElementById("chat-display");
+    if (state === 0){
+        const time = new Date();
+        const now = time.getMinutes();
+        display.innerHTML += `<h5 class="notice_message">${now}</h5>`;
+    } else if (state == false){
+        // user leaves the group chat
+        display.innerHTML += `<h5 class="notice_message">${user} left the group chat</h5>`;
+    } else {
+        // user joins the group chat
+        display.innerHTML += `<h5 class="notice_message">${user} joined the group chat</h5>`;
+    }
 }

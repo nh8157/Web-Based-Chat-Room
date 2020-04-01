@@ -52,6 +52,7 @@ body{
     height: 100%;
     background-color: #d5dde5;
     box-shadow: 10px 0 10px rgba(0, 0, 0, 0.1);
+    overflow: scroll;
 }
 
 #wrapper
@@ -189,7 +190,7 @@ li:active{
 #main-container
 #main-content
 #chat-display
-.timestamp-message{
+.notice-message{
     text-align: center;
     margin-top: 5px;
     margin-bottom: 20px;
@@ -250,3 +251,31 @@ li:active{
 .fa-paper-plane:hover{
     color: #00B4B4;
 }
+/* 
+.alert {
+    padding: 40px;
+    width: 40%;
+    background-color: #ff3100; /* Red */
+    /* font-size: larger;
+    position: fixed;
+    top: 45%;
+    color: white;
+  } */
+
+  /* The close button */
+  /* .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: x-large;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.5s;
+  } */
+  
+  /* When moving the mouse over the close button */
+  /* .closebtn:hover {
+    color: black;
+    transition: 0.5s;
+  } */
