@@ -40,8 +40,8 @@ class Peers{
         if (!self.get_state()){
             // send requests to server
             // load the users into the array
+
             const user_list = ["Amy", "Tom", "Vivian"];
-            console.log(user_list)
             this.group_members = user_list;
             // display the users on the sidebar
             user_display(this.group_members);
@@ -56,11 +56,12 @@ class Peers{
             user_list.push(self.get_name());
             this.group_members = user_list;
             // display the users on the sidebar
+            console.log("joining chat");
             user_display(this.group_members);
         } else {
             // already in chat mode
             // give user an alert that he's already chatting
-            window.alert("You are already in Chat!");
+            console.log("in chat");
         }
     }
     self_leave(self){
@@ -87,7 +88,7 @@ class Peers{
             return this.group_members != name;
         }
         )
-        user_display(this.group_members);
+        user_delete(name);
         notice_display(name, false);
     }
 }
@@ -97,7 +98,11 @@ class Peers{
 const self = new User("admin");
 const peer = new Peers();
 peer.self_join_system(self);
-peer.self_join_chat(self);
+ 
+peer.peer_join("Zander");
+
+user_click(self, peer);
+
 
 // <!----------MAIN SENDING FUNCTION---------->
 const sendbtn = document.getElementById("user-send")
@@ -124,7 +129,7 @@ sendbtn.onclick = function (){
 
 // <!----------MAIN RECEIVING FUNCTION---------->
 
-function receive_msg(user){
+function msg_receive(user){
     // Here the client receives the message from remote server in JSON format
     // translate the message into normal format
     msg_display(user, msg);
@@ -148,9 +153,30 @@ function user_display(users){
     // receives an array
     // display the user's name with fontawesome icon next to it
     const sidebar = document.getElementById("users-sidebar");
+    sidebar.innerHTML = "";
     users.forEach(user => {
-        sidebar.innerHTML += `<li>${user}</li>`;
+        sidebar.innerHTML += `<li id="user-${user}">${user}</li>`;
     });
+}
+
+function user_delete(user){
+    const sidebar = document.getElementById("users-sidebar");
+    const element = document.getElementById(`user-${user}`);
+    console.log(element);
+    sidebar.removeChild(element);
+}
+
+function user_click(self, peer){
+    const sidebar = document.getElementById("users-sidebar").getElementsByTagName("li");
+    let username="";
+    for (let i = 0; i < sidebar.length; i ++){
+        sidebar[i].onclick = function() {
+            username = sidebar[i].textContent;
+            console.log(username);
+            peer.self_join_chat(self, username);
+        }
+    }
+    // here sends the name of the user selected to the server to establish a connection
 }
 
 function notice_display(user=false, state=0){
@@ -159,13 +185,14 @@ function notice_display(user=false, state=0){
     const display = document.getElementById("chat-display");
     if (state === 0){
         const time = new Date();
-        const now = time.getMinutes();
-        display.innerHTML += `<h5 class="notice_message">${now}</h5>`;
+        const hr = time.getHours();
+        const min = time.getMinutes();
+        display.innerHTML += `<h5 class="notice-message">${hr}:${min}</h5>`;
     } else if (state == false){
         // user leaves the group chat
-        display.innerHTML += `<h5 class="notice_message">${user} left the group chat</h5>`;
+        display.innerHTML += `<h5 class="notice-message">${user} left the group chat</h5>`;
     } else {
         // user joins the group chat
-        display.innerHTML += `<h5 class="notice_message">${user} joined the group chat</h5>`;
+        display.innerHTML += `<h5 class="notice-message">${user} joined the group chat</h5>`;
     }
 }
