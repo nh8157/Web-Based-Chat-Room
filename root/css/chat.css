@@ -39,6 +39,33 @@ body{
     padding-top: 1%;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     color: #404b5a;
+    position: relative;
+}
+
+#wrapper
+#main-container
+#main-header
+#leave-header{
+    position: absolute;
+    right: 0.8%;
+    margin-top: -6.5vh;
+    border-radius: 15px;
+    padding: 10px;
+    background-color: #d1dde5;
+    color: #404b5a;
+}
+
+#wrapper
+#main-container
+#main-header
+#leave-header:hover{
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    background-color: #36BDBD;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 #wrapper

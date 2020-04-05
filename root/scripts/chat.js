@@ -40,24 +40,30 @@ class Peers{
         if (!self.get_state()){
             // send requests to server
             // load the users into the array
-
+            
             const user_list = ["Amy", "Tom", "Vivian"];
             this.group_members = user_list;
             // display the users on the sidebar
             user_display(this.group_members);
+            // assign click object to each list object
+            user_click(self, this);
+            console.log("finished");
         }
     }
-    self_join_chat(self, peer){
+    self_join_chat(self){
         if (!self.get_state()){
             // send the name of the peer selected to the server
             // get the new list of users in the group chat
             self.join_chat();
             const user_list = ["Lily", "Tom", "Julia"];
+            // change the button to Leave Chat
+            const leave = document.getElementById("leave-header");
+            leave.innerHTML = "Leave Chat";
             user_list.push(self.get_name());
             this.group_members = user_list;
             // display the users on the sidebar
-            console.log("joining chat");
             user_display(this.group_members);
+            user_click(self, this);
         } else {
             // already in chat mode
             // give user an alert that he's already chatting
@@ -74,6 +80,7 @@ class Peers{
             this.group_members = user_list;
             // display the users on the sidebar
             user_display(this.group_members);
+            user_click(self, this);
         }
     }
     peer_join(name){
@@ -81,31 +88,34 @@ class Peers{
         this.group_members.push(name);
         user_display(this.group_members);
         // sends an alert in group chat
+        user_click(self, this);
         notice_display(name, true);
     }
     peer_leave(name){
-        this.group_members = this.group_members.filter(() => {
-            return this.group_members != name;
+        // stupid javascript doesn't even have remove function
+        // following lines are for removing one peer from the list
+        let new_list = [];
+        for (let i = 0; i< this.group_members.length; i++){
+            if (this.group_members[i] != name){
+                new_list.push(this.group_members[i]);
+            }
         }
-        )
-        user_delete(name);
+        this.group_members = new_list;
+        user_display(this.group_members);
+        user_click(self, this);
         notice_display(name, false);
     }
 }
 
 // <!----------MAIN EXECUTION SECTION---------->
 
-const self = new User("admin");
+const self = new User("Sheldon");
 const peer = new Peers();
 peer.self_join_system(self);
- 
 peer.peer_join("Zander");
 
-user_click(self, peer);
-
-
 // <!----------MAIN SENDING FUNCTION---------->
-const sendbtn = document.getElementById("user-send")
+const sendbtn = document.getElementById("user-send");
 
 sendbtn.onclick = function (){
     // send the data to the chat
@@ -135,6 +145,12 @@ function msg_receive(user){
     msg_display(user, msg);
 }
 
+// <!---------- MAIN LEAVING FUNCTION ---------->
+
+document.getElementById("leave-header").onclick = function (){
+    peer.self_leave(self);
+    document.getElementById("leave-header").innerHTML = "Log Out";
+}
 // <!----------   UTILITY FUNCTIONS   ---------->
 
 function msg_display(user, msg){
@@ -159,24 +175,16 @@ function user_display(users){
     });
 }
 
-function user_delete(user){
-    const sidebar = document.getElementById("users-sidebar");
-    const element = document.getElementById(`user-${user}`);
-    console.log(element);
-    sidebar.removeChild(element);
-}
-
 function user_click(self, peer){
     const sidebar = document.getElementById("users-sidebar").getElementsByTagName("li");
-    let username="";
+    let username = "";
     for (let i = 0; i < sidebar.length; i ++){
         sidebar[i].onclick = function() {
-            username = sidebar[i].textContent;
-            console.log(username);
-            peer.self_join_chat(self, username);
+            console.log(sidebar[i].textContent);
+            // here sends the name of the user selected to the server to establish a connection
+            peer.self_join_chat(self, peer);
         }
     }
-    // here sends the name of the user selected to the server to establish a connection
 }
 
 function notice_display(user=false, state=0){

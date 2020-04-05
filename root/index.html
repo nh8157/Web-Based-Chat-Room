@@ -18,20 +18,13 @@
                     <form action="/index.html" method="POST">
                         <label for="user-name" class="form-label">Name</label><br>
                         <div class="textbox-icon">
-                            <input type="text" name="user-name" class="user-input"><i class="fas fa-user" aria-hidden="true"></i><br>
+                            <input type="text" name="user-name" class="user-input" autocomplete="off"><br>
                         </div>
                         <label for="user-password" class="form-label">Password</label><br>
                         <div class="textbox-icon">
-                            <input type="password" name="user-password" class="user-input"><i class="fas fa-lock" aria-hidden="true"></i><br>
+                            <input type="password" name="user-password" class="user-input"><br>
                         </div>
-                        <label for="chat-room" class="form-label">Chat Room</label><br>
                         <!-- needs to be replaced with better animation -->
-                        <select name="chat-room" class="user-input" placeholder="">
-                            <option value="JavaScript">JavaScript</option>
-                            <option value="Python">Python</option>
-                            <option value="C++">C++</option>
-                            <option value="Create">Create My Own Room</option>
-                        </select><br>
                         <input type="button" value="Login" id="submit-button"><br>
                         <!-- <input type="button" value="New User?" id="new-button"> -->
                     </form>
