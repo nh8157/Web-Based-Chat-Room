@@ -3,34 +3,33 @@
     <head>
         <title>Chat Log In</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/css/index.css">
+        <link rel="stylesheet" href="/css/register.css">
     </head>
     <body>
         <div id="main-container">
             <div id="main-header">
                 <div id="header">
-                    <h1>Account Register</h1>
+                    <h1>Register</h1>
                 </div>
             </div>
             <div id="main-content">
                 <div id="login-form">
                     <form action="/index.html" method="POST">
                         <label for="user-name" class="form-label">Name</label><br>
-                        <input type="text" name="user-name" class="user-input"><br>
-                        <label for="user-password" class="form-label">Password</label><br>
+                        <input type="text" name="user-name" class="user-input" autocomplete="off" id="name"><br>
+                        <label for="user-password" class="form-label" id="pass1">Password</label><br>
                         <input type="password" name="user-password" class="user-input"><br>
-                        <label for="chat-room" class="form-label">Chat Room</label><br>
+                        <label for="user-password" class="form-label" id="pass2">Confirm Password</label><br>
+                        <input type="password" name="user-password" class="user-input"><br>
                         <!-- needs to be replaced with better animation -->
-                        <select name="chat-room" class="user-input">
-                            <option value="JavaScript">JavaScript</option>
-                            <option value="Python">Python</option>
-                            <option value="C++">C++</option>
-                        </select><br>
-                        <input type="button" value="Login" id="submit-btn">
+                        <div id="submit">
+                            <input type="button" value="Register" id="submit-button">
+                        </div>
                     </form>
                 </div>
             </div>
             <div id="main-footer"></div>
         </div>
+        <script src="/scripts/register.js"></script>
     </body>
 </html>

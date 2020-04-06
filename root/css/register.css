@@ -21,8 +21,8 @@ body{
     background-color: #e1e7ec;
     position: absolute;
     margin-left: 32%;
-    margin-top: 8%;
-    height: 65%;
+    margin-top: 4%;
+    height: 80%;
     width: 35%;
     border-radius: 20px 20px 20px 20px;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
@@ -40,11 +40,8 @@ body{
 #main-container
 #main-header:hover{
     color: #00B4B4;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;}
+    transition: 0.3s ease-in-out;
+}
 
 #main-container
 #main-content{
@@ -60,6 +57,13 @@ body{
     font-style: normal;
     color: #6e7a8a;
     margin-bottom: 5px;
+}
+
+#main-container
+#main-content
+.form-label:hover{
+    color: #00B4B4;
+    transition: 0.3s ease-in-out;
 }
 
 #main-container
@@ -80,13 +84,18 @@ body{
 #main-container
 #main-content
 #login-form
+.user-input:hover{
+    border-bottom: 1px solid #00B4B4;
+    transition: 0.3s ease-in-out;
+}
+
+#main-container
+#main-content
+#login-form
 .user-input:focus{
     border-bottom: 2px solid #36BDBD;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;}
+    transition: 0.3s ease-in-out;
+}
 
 #main-container
 #main-content
@@ -98,6 +107,6 @@ body{
     font-size: larger;
     color: #e1e7ec;
     text-align: center;
-    margin-left: 32%;
+    margin-left: 31%;
     margin-top: 13%;
 }

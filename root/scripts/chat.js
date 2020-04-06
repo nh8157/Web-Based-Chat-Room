@@ -118,23 +118,29 @@ peer.peer_join("Zander");
 const sendbtn = document.getElementById("user-send");
 
 sendbtn.onclick = function (){
-    // send the data to the chat
-    const chatbox = document.getElementById("user-chatbox");
-    const msg = chatbox.value;
-    // determine if the msg is empty
-    if (msg === ""){
-        chatbox.placeholder = "Empty Message";
-        setTimeout(function(){
-            chatbox.placeholder = "Say something";
-        }, 2000);
-        console.log("emptymessage");
-    }else{
-        // display only available after server echo
-        chatbox.value = "";
-        // Here the client also sends the message to the remote server
-        msg_display(self, msg)
+    // determine if the user is in chat
+    if (self.get_state()){
+        // send the data to the chat
+        const chatbox = document.getElementById("user-chatbox");
+        const msg = chatbox.value;
+        // determine if the msg is empty
+        if (msg === ""){
+            chatbox.placeholder = "Empty Message";
+            setTimeout(function(){
+                chatbox.placeholder = "Say something";
+            }, 2000);
+            console.log("emptymessage");
+        }else{
+            // display only available after server echo
+            chatbox.value = "";
+            // Here the client also sends the message to the remote server
+            msg_display(self, msg)
+        }
+        return false;
+    } else {
+        // will be replaced with box warning
+        alert("Not in chat!")
     }
-    return false;
 }
 
 // <!----------MAIN RECEIVING FUNCTION---------->

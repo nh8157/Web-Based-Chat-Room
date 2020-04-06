@@ -9,6 +9,9 @@
     font-family: 'Baloo Da 2', cursive;
     scroll-behavior: smooth;
 }
+input:focus{
+    outline: none;
+}
 
 body{
     background-color: #6e7a8a;
