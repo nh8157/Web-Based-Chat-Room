@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div id="main-container">
+    <div id="main-container">
     <div id="main-header">
         <div id="header">
             <h1>Sign In</h1>
@@ -16,7 +16,7 @@
     </div>
     <div id="main-content">
         <div id="login-form">
-            <form action="{{ url_for('chat') }}" method="POST">
+            <form action="{{ url_for('login') }}" method="POST">
                 <label for="user-name" class="form-label">Name</label><br>
                 {{ displayField(form.username, autocomplete="off", class="user-input") }}
                 <label for="user-password" class="form-label">Password</label><br>
@@ -25,42 +25,9 @@
                 <div class="form-group">
                     <input type="submit" value="Login" id="submit-button"><br>
                 </div>
+                {{ form.csrf_token }}
             </form>
         </div>
     </div>
 </div>
 {% endblock %}
-<!-- 
-<!DOCTYPE html>
-<html lang="en-US">
-    <head>
-        <title>Chat Log In</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/static/styles/login.css">
-    </head>
-    <body>
-        <div id="main-container">
-            <div id="main-header">
-                <div id="header">
-                    <h1>Sign In</h1>
-                </div>
-            </div>
-            <div id="main-content">
-                <div id="login-form">
-                    <form action="{{ url_for('login') }}" method="POST">
-                        <label for="user-name" class="form-label">Name</label><br>
-                        {{ displayField(form.username, autocomplete="off", class="user-input") }}
-                        <input type="text" name="user-name" class="user-input" autocomplete="off"><br> -->
-                        <!-- <label for="user-password" class="form-label">Password</label><br>
-                        {{ displayField(form.password, class="user-input") }} -->
-                        <!-- needs to be replaced with better animation -->
-                        <!-- <div class="form-group">
-                            <input type="submit" value="Login" id="submit-button"><br>
-                        </div> -->
-                        <!-- <input type="button" value="New User?" id="new-button"> -->
-                    <!-- </form>
-                </div>
-            </div>
-        </div>
-    </body>
-</html> -->

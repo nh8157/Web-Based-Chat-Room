@@ -123,7 +123,7 @@ def login():
         login_user(user_object)
         user_object.status = 'login'
         db.session.commit()
-        return redirect(url_for('chatlist'))
+        return redirect(url_for('chat'))
 
     return render_template("login.html", form=login_form)
 
@@ -154,7 +154,7 @@ def chat():
     if not current_user.is_authenticated:
         flash('Please login', 'danger')
         return redirect(url_for('login'))
-
+    print('here')
     return render_template("chat.html", username=current_user.username)
 
 

@@ -4,7 +4,7 @@
         <title>
             Chat Room
         </title>
-        <link rel="stylesheet" href="/css/chat.css">
+        <link rel="stylesheet" href="/static/styles/chat.css">
         <script src="https://kit.fontawesome.com/f056a69bc8.js" crossorigin="anonymous"></script>
     </head>
     <body>
@@ -52,13 +52,14 @@
                 <div id="main-chatbox">
                    <form>
                         <input type="text" id="user-chatbox" placeholder="Say something!" autocomplete="off">
-                        <button type="submit" id="user-send"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                        <button type="submit" id="user-send"></button>
+                        <!-- <i class="fas fa-paper-plane" aria-hidden="true"></i> -->
                     </form>
                 </div>
                 </div>
             </div>
         </div>
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-        <script src="/scripts/chat.js"></script>
+        <script src="/static/scripts/chat.js"></script>
     </body>
 </html>
