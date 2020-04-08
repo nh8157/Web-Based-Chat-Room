@@ -8,6 +8,7 @@
         <script src="https://kit.fontawesome.com/f056a69bc8.js" crossorigin="anonymous"></script>
     </head>
     <body>
+        <div id="username" style="display: none;">{{username}}</div>
         <div id="wrapper">
             <div id="main-container">
                 <div id="main-header">
@@ -52,14 +53,13 @@
                 <div id="main-chatbox">
                    <form>
                         <input type="text" id="user-chatbox" placeholder="Say something!" autocomplete="off">
-                        <button type="submit" id="user-send"></button>
-                        <!-- <i class="fas fa-paper-plane" aria-hidden="true"></i> -->
+                        <button type="submit" id="user-send"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
                     </form>
                 </div>
                 </div>
             </div>
         </div>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
         <script src="/static/scripts/chat.js"></script>
     </body>
 </html>

@@ -272,6 +272,7 @@ li:active{
 .fa-paper-plane{
     font-size: x-large;
     color: #008989;
+    outline: none;
 }
 
 #wrapper

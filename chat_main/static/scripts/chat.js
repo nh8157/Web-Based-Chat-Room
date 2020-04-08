@@ -39,15 +39,14 @@ class Peers{
     self_join_system(self){
         if (!self.get_state()){
             // send requests to server
+            socket.send()
             // load the users into the array
-            
             const user_list = ["Amy", "Tom", "Vivian"];
             this.group_members = user_list;
             // display the users on the sidebar
             user_display(this.group_members);
             // assign click object to each list object
             user_click(self, this);
-            console.log("finished");
         }
     }
     self_join_chat(self){
@@ -108,11 +107,24 @@ class Peers{
 }
 
 // <!----------MAIN EXECUTION SECTION---------->
+// establishes connection with the server
+const socket = io.connect('http://127.0.0.1:5000');
 
-const self = new User("Sheldon");
-const peer = new Peers();
-peer.self_join_system(self);
-peer.peer_join("Zander");
+socket.on("connect", ()=> {
+    const self_name = document.getElementById("username").textContent;
+    console.log(self_name);
+    socket.send(self_name);
+    const self = new User(self_name);
+})
+
+// socket.on("message", (msg)=>{
+//     console.log(msg);
+// })
+
+
+// const peer = new Peers();
+// peer.self_join_system(self);
+// peer.peer_join("Zander");
 
 // <!----------MAIN SENDING FUNCTION---------->
 const sendbtn = document.getElementById("user-send");

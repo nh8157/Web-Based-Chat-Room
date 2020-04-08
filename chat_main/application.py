@@ -154,7 +154,6 @@ def chat():
     if not current_user.is_authenticated:
         flash('Please login', 'danger')
         return redirect(url_for('login'))
-    print('here')
     return render_template("chat.html", username=current_user.username)
 
 
@@ -162,6 +161,9 @@ def chat():
 def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
+
+@socketio.on('join_system')
+def on_system(data):
 
 
 @socketio.on('message')
@@ -219,4 +221,4 @@ def on_leave(data):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app)
