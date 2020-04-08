@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, join_room, leave_room, send, emit
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
+import json
 
 from passlib.hash import pbkdf2_sha256
 # from wtform_fields import *
@@ -120,16 +121,19 @@ def login():
     # Allow login if validation success
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(username=login_form.username.data).first()
+        print('here', user_object.is_authenticated)
         login_user(user_object)
+        print('check', user_object.is_authenticated)
         user_object.status = 'login'
         db.session.commit()
+        print('check2', user_object.is_authenticated)
         return redirect(url_for('chat'))
 
     return render_template("login.html", form=login_form)
 
 
 @app.route("/logout", methods=['GET'])
-#@login_required
+@login_required
 def logout():
     # Logout user
     logout_user()
@@ -140,7 +144,7 @@ def logout():
 
 
 @app.route("/chatlist", methods=['GET'])
-#@login_required
+@login_required
 def chatlist():
     users=User.query.filter_by(status='login').all()
     name_list = [i.username for i in users if i != current_user and i.status == 'login']
@@ -148,7 +152,7 @@ def chatlist():
 
 
 @app.route("/chat", methods=['GET', 'POST'])
-# @login_required
+@login_required
 def chat():
 
     if not current_user.is_authenticated:
@@ -166,16 +170,30 @@ def page_not_found(e):
 @socketio.on('message')
 def on_message(data):
     """Broadcast messages"""
-    print(data)
-    send(data, broadcast=True)
-    # room_id = data["room"]
-    # room = Room.query.filter_by(id=room_id)
-    # send({"username": data["username"], "msg": data["msg"]}, room=room)
+    data = json.loads(data)
+    user = User.query.filter_by(username=data['username']).first()
+    room = user.room
+    msg = {"username": data["username"], "msg": data["msg"]}
+    msg = json.dumps(msg)
+    send(msg, room=room)
+
+
+@socketio.on('users')
+def on_users(data):
+    data = json.loads(data)
+    users = User.query.filter_by(is_authenticated=True).all()
+    print(data['username'],users)
+    peers = [i.username for i in users if i.username != data['username']]
+    msg = {"username": data['username'], "peers": peers}
+    print(peers)
+    msg = json.dumps(msg)
+    emit('users', msg)
 
 
 @socketio.on('join')
 def on_join(data):
     """User joins a room"""
+    data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     partner = User.query.filter_by(username=data['partner']).first()
     if not partner.room:
@@ -183,6 +201,7 @@ def on_join(data):
         emit('join', msg)
     room = partner.room
     msg = {'username': user.username, 'success': True, 'room': room.id}
+    msg = json.dumps(msg)
     join_room(partner.room)
     user.room = room
     db.session.commit()
@@ -193,6 +212,7 @@ def on_join(data):
 def on_create(data):
     """create a new group"""
     try:
+        data = json.loads(data)
         room = Room()
         db.session.add(room)
         db.session.commit()
@@ -200,23 +220,29 @@ def on_create(data):
         user = User.query.filter_by(username=data['username']).first()
         user.room = room
         db.session.commit()
-        msg = {'username': user.username, 'success': True}
+        msg = {'username': user.username, 'success': True, 'room': room.id}
+        msg = json.dumps(msg)
         emit('create', msg)
     except:
         msg = {'username': user.username, 'success': False}
+        msg = json.dumps(msg)
         emit('create', msg)
 
 
 @socketio.on('leave')
 def on_leave(data):
     """User leaves a room"""
+    data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     room = user.room
     leave_room(room)
     user.room = None
     db.session.commit()
     msg = {'username': user.username, 'success': True}
+    msg = json.dumps(msg)
     emit('leave', msg, room=room)
+
+
 
 
 if __name__ == "__main__":

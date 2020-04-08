@@ -34,44 +34,31 @@ class User{
 // In chat mode, Peers object is loaded with users in the chat group
 class Peers{
     constructor(){
-        this.group_members = []
+        this.group_members = [];
+        this.room = false;
     }
-    self_join_system(self){
-        if (!self.get_state()){
-            // send requests to server
-            // load the users into the array
-            const self_info = JSON.stringify({"username": self.get_name()});
-            socket.send(self_info);
-            self.state_change();
-            const user_list = ["Amy", "Tom", "Vivian"];
-            this.group_members = user_list;
-            // display the users on the sidebar
-            user_display(this.group_members);
-            // assign click object to each list object
-            user_click(self, this);
-        }
+    self_join_system(self, msg){
+        // send requests to server
+        // load the users into the array
+        this.group_members = msg;
+        self.state_change();
+        user_display(this.group_members);
+        user_click(self, this);
     }
-    self_join_chat(self, peer){
-        if (!self.get_state()){
-            // send the name of the peer selected to the server
-            // get the new list of users in the group chat
-            const self_msg = JSON.stringify({"username": self.get_name(), "partner": peer});
-            socket.emit("join", self_msg);
-            self.join_chat();
-            // change the button to Leave Chat
-            const leave = document.getElementById("leave-header");
-            leave.innerHTML = "Leave Chat";
-            let user_list = ["Tom", "Winnie", "Dragon"];
-            user_list.push(self.get_name());
-            this.group_members = user_list;
-            // display the users on the sidebar
-            user_display(this.group_members);
-            user_click(self, this);
-        } else {
-            // already in chat mode
-            // give user an alert that he's already chatting
-            console.log("in chat");
-        }
+    self_join_chat(self, peers, room){
+        // send the name of the peer selected to the server
+        // get the new list of users in the group chat
+        self.join_chat();
+        // reassign room number and group members
+        this.room = room;
+        this.group_members = peers;
+        // change the button to Leave Chat
+        const leave = document.getElementById("leave-header");
+        leave.innerHTML = "Leave Chat";
+        // display the users on the sidebar
+        user_display(this.group_members);
+        // reassign click object to array objects
+        user_click(self, this);
     }
     self_leave(self){
         if (self.get_state()){
@@ -121,7 +108,25 @@ const peer = new Peers();
 const socket = io.connect('http://127.0.0.1:5000');
 // upon connection send connection message to the server
 socket.on("connect", ()=> {
-    peer.self_join_system(self);
+    const self_info = JSON.stringify({"username": self.get_name()});
+    socket.emit("users", self_info);
+})
+
+socket.on("users", (msg)=>{
+    // display the users on the sidebar
+    // assign click object to each list object
+    const user_msg = JSON.parse(msg);
+    console.log(user_msg);
+    const user_name = user_msg["username"];
+    console.log(user_name);
+    // myself joining the system
+    if (user_name == self.get_name()){
+        peer.self_join_system(self, user_msg["peers"]);
+    } else if (!self.get_state()){
+        // not self
+        // self not in chat
+        peer.peer_join(user_name);
+    }
 })
 // receiving messages from the server
 socket.on("message", (msg)=>{
@@ -131,8 +136,17 @@ socket.on("message", (msg)=>{
 // peers joining the chat
 socket.on("join", (msg)=>{
     const join_msg = JSON.parse(msg);
-    const name = join_msg["username"];
-    peer.peer_join(name);
+    const name = join_msg["username"]["username"];
+    if (name == self.get_name() && join_msg["success"]){
+        // if this is self
+        // load users in the array
+        // peer.self_join_chat(self, join_msg[""]);
+    } else if (name != self.get_name()){
+        // if this is not self
+        peer.peer_join(name);
+    } else {
+        alert("An error occurred when joining the room");
+    }
 })
 // peers leaving the chat
 socket.on("leave", (msg)=>{
@@ -160,7 +174,8 @@ sendbtn.onclick = function (){
             // display only available after server echo
             chatbox.value = "";
             // Here the client also sends the message to the remote server
-            msg_display(self, msg)
+            const json_msg = JSON.stringify({"username": self.get_name(), "msg": msg});
+            socket.send("message", json_msg);
         }
         return false;
     } else {
@@ -212,9 +227,9 @@ function user_click(self, peer){
     let username = "";
     for (let i = 0; i < sidebar.length; i ++){
         sidebar[i].onclick = function() {
-            console.log(sidebar[i].textContent);
             // here sends the name of the user selected to the server to establish a connection
-            peer.self_join_chat(self, sidebar[i].textContent);
+            const self_msg = JSON.stringify({"username": sidebar[i].textContent, "partner": peer});
+            socket.emit("join", self_msg);
         }
     }
 }
