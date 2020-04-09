@@ -40,8 +40,8 @@ class Peers{
     self_join_system(self, msg){
         // send requests to server
         // load the users into the array
-        this.group_members = msg;
-        self.state_change();
+        this.group_members = array_remove(msg)
+        console.log(this.group_members);
         user_display(this.group_members);
         user_click(self, this);
     }
@@ -60,39 +60,28 @@ class Peers{
         // reassign click object to array objects
         user_click(self, this);
     }
-    self_leave(self){
-        if (self.get_state()){
-            // in chat mode
-            // quit back to single mode
-            const self_msg = JSON.stringify({"username": self.get_name()});
-            socket.emit("leave", self_msg);
-            self.leave_chat();
-            // get list of users in the system
-            const user_list = ["Tom", "Cindy", "Vivian", "Julia"];
-            this.group_members = user_list;
-            // display the users on the sidebar
-            user_display(this.group_members);
-            user_click(self, this);
-        }
+    self_leave_chat(self){
+        // quit back to single mode
+        self.leave_chat();
+        // reassign user and room value
+        this.room = false;
+        document.getElementById("leave-header").innerHTML = "Log Out";
     }
-    peer_join(name){
+    // self_leave_system(self){
+        
+    // }
+    peer_join(self, name){
         // display the new user list
+        console.log("here");
         this.group_members.push(name);
         user_display(this.group_members);
         // sends an alert in group chat
         user_click(self, this);
         notice_display(name, true);
     }
-    peer_leave(name){
-        // stupid javascript doesn't even have remove function
-        // following lines are for removing one peer from the list
-        let new_list = [];
-        for (let i = 0; i< this.group_members.length; i++){
-            if (this.group_members[i] != name){
-                new_list.push(this.group_members[i]);
-            }
-        }
-        this.group_members = new_list;
+    peer_leave(self, name){
+        this.group_members = array_remove(this.group_members, name);
+        console.log(this.group_members);
         user_display(this.group_members);
         user_click(self, this);
         notice_display(name, false);
@@ -111,49 +100,74 @@ socket.on("connect", ()=> {
     const self_info = JSON.stringify({"username": self.get_name()});
     socket.emit("users", self_info);
 })
-
 socket.on("users", (msg)=>{
     // display the users on the sidebar
     // assign click object to each list object
     const user_msg = JSON.parse(msg);
-    console.log(user_msg);
-    const user_name = user_msg["username"];
-    console.log(user_name);
+    console.log(self.get_state())
     // myself joining the system
-    if (user_name == self.get_name()){
+    if (!self.get_state()){
         peer.self_join_system(self, user_msg["peers"]);
-    } else if (!self.get_state()){
-        // not self
-        // self not in chat
-        peer.peer_join(user_name);
     }
 })
 // receiving messages from the server
-socket.on("message", (msg)=>{
-    const join_msg = JSON.parse(msg);
-    console.log(join_msg["username"]);
+socket.on("send", (msg)=>{
+    const new_msg = JSON.parse(msg);
+    console.log(new_msg);
+    const name = new_msg["username"];
+    const user_msg = new_msg["msg"];
+    msg_display(name, user_msg);
 })
 // peers joining the chat
 socket.on("join", (msg)=>{
     const join_msg = JSON.parse(msg);
-    const name = join_msg["username"]["username"];
-    if (name == self.get_name() && join_msg["success"]){
-        // if this is self
+    const name = join_msg["username"];
+    console.log(join_msg);
+    if (join_msg["peers"].includes(self.get_name()) && !self.get_state()){
+        // self is pulled into a group chat
         // load users in the array
-        // peer.self_join_chat(self, join_msg[""]);
-    } else if (name != self.get_name()){
+        if (name == self.get_name()){
+            peer.self_join_chat(self, join_msg["peers"], join_msg["room"]);
+        } else {
+            console.log(name);
+            const self_msg = JSON.stringify({"username": self.get_name(), "partner": name});
+            socket.emit("join", self_msg);
+        }
+    } else if (!self.get_state() && name != self.get_name()){
         // if this is not self
-        peer.peer_join(name);
+        peer.peer_join(self, name);
     } else {
         alert("An error occurred when joining the room");
     }
 })
-// peers leaving the chat
 socket.on("leave", (msg)=>{
+    console.log("someone leaving");
     const leave_msg = JSON.parse(msg);
     const name = leave_msg["username"];
-    peer.peer_leave(name);
+    console.log(leave_msg);
+    if (name == self.get_name()){
+        // self leaving the group chat
+        const self_info = JSON.stringify({"username": self.get_name()});
+        socket.emit("users", self_info);
+        peer.self_leave_chat(self);
+    } else {
+        // peers leaving the group chat
+        peer.peer_leave(self, name);
+    }
 })
+
+socket.on("logout", (msg)=>{
+    const logout_msg = JSON.parse(msg);
+    const name = logout_msg["username"];
+    console.log(name);
+    if (name == self.get_name()){
+        window.location.href = "/logout";
+    } else if (self.get_state() == false){
+        peer.peer_leave(self, name);
+        console.log(name, "is logging out");
+    }
+})
+
 // <!----------MAIN SENDING FUNCTION---------->
 const sendbtn = document.getElementById("user-send");
 
@@ -175,7 +189,7 @@ sendbtn.onclick = function (){
             chatbox.value = "";
             // Here the client also sends the message to the remote server
             const json_msg = JSON.stringify({"username": self.get_name(), "msg": msg});
-            socket.send("message", json_msg);
+            socket.emit("send", json_msg);
         }
         return false;
     } else {
@@ -184,30 +198,26 @@ sendbtn.onclick = function (){
     }
 }
 
-// <!----------MAIN RECEIVING FUNCTION---------->
-
-function msg_receive(user){
-    // Here the client receives the message from remote server in JSON format
-    // translate the message into normal format
-    msg_display(user, msg);
-}
-
 // <!---------- MAIN LEAVING FUNCTION ---------->
 
 document.getElementById("leave-header").onclick = function (){
-    peer.self_leave(self);
-    document.getElementById("leave-header").innerHTML = "Log Out";
+    const self_msg = JSON.stringify({"username": self.get_name()});
+    if (self.get_state()){
+        console.log("leaving");
+        socket.emit("leave", self_msg);
+    } else {
+        socket.emit("logout", self_msg);
+    }
 }
 // <!----------   UTILITY FUNCTIONS   ---------->
 
-function msg_display(user, msg){
+function msg_display(username, msg){
     // display the message and its sender
     // determine if the sender is self
     // user is a class object
     const display = document.getElementById("chat-display");
     const scrollbar = document.getElementById("main-content");
-    const username = user.get_name();
-    const msg_class = user == self ? "self":"other";
+    const msg_class = username == self.get_name() ? "self":"other";
     display.innerHTML += `<p class="${msg_class}-message">${msg}</p><h4 class="${msg_class}-name">${username}</h4><br>`;
     scrollbar.scrollTop = scrollbar.scrollHeight;
 }
@@ -228,8 +238,13 @@ function user_click(self, peer){
     for (let i = 0; i < sidebar.length; i ++){
         sidebar[i].onclick = function() {
             // here sends the name of the user selected to the server to establish a connection
-            const self_msg = JSON.stringify({"username": sidebar[i].textContent, "partner": peer});
-            socket.emit("join", self_msg);
+            if (!self.get_state()){
+                const self_msg = JSON.stringify({"username": self.get_name(), "partner": sidebar[i].textContent});
+                socket.emit("join", self_msg);
+                console.log(self_msg);
+            } else {
+                console.log("in chat");
+            }
         }
     }
 }
@@ -250,4 +265,10 @@ function notice_display(user=false, state=0){
         // user joins the group chat
         display.innerHTML += `<h5 class="notice-message">${user} joined the group chat</h5>`;
     }
+}
+
+function array_remove(arr, value){ 
+    return arr.filter(function(ele){ 
+        return ele != value; 
+    });
 }

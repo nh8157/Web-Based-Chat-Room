@@ -94,11 +94,9 @@ socketio = SocketIO(app, manage_session=False)
 def index():
     reg_form = RegistrationForm()
     # Update database if validation success
-    print(reg_form.validate_on_submit())
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
-        print(username, password)
         # Hash password
         hashed_pswd = pbkdf2_sha256.hash(password)
 
@@ -121,12 +119,9 @@ def login():
     # Allow login if validation success
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(username=login_form.username.data).first()
-        print('here', user_object.is_authenticated)
         login_user(user_object)
-        print('check', user_object.is_authenticated)
         user_object.status = 'login'
         db.session.commit()
-        print('check2', user_object.is_authenticated)
         return redirect(url_for('chat'))
 
     return render_template("login.html", form=login_form)
@@ -137,8 +132,6 @@ def login():
 def logout():
     # Logout user
     logout_user()
-    current_user.status = 'logout'
-    db.session.commit()
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
 
@@ -149,7 +142,6 @@ def chatlist():
     users=User.query.filter_by(status='login').all()
     name_list = [i.username for i in users if i != current_user and i.status == 'login']
     return ' '.join(name_list)
-
 
 @app.route("/chat", methods=['GET', 'POST'])
 @login_required
@@ -166,28 +158,26 @@ def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
 
+@socketio.on('users')
+def on_users(data):
+    data = json.loads(data)
+    users = User.query.filter_by(status='login').all()
+    peers = [i.username for i in users]
+    msg = {"username": data['username'], "peers": peers}
+    msg = json.dumps(msg)
+    emit('users', msg, broadcast=True)
 
-@socketio.on('message')
-def on_message(data):
+@socketio.on('send')
+def on_send(data):
     """Broadcast messages"""
     data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     room = user.room
+    print(room.id)
     msg = {"username": data["username"], "msg": data["msg"]}
+    print(msg)
     msg = json.dumps(msg)
-    send(msg, room=room)
-
-
-@socketio.on('users')
-def on_users(data):
-    data = json.loads(data)
-    users = User.query.filter_by(is_authenticated=True).all()
-    print(data['username'],users)
-    peers = [i.username for i in users if i.username != data['username']]
-    msg = {"username": data['username'], "peers": peers}
-    print(peers)
-    msg = json.dumps(msg)
-    emit('users', msg)
+    emit('send', msg, room=room.id, include_self=True)
 
 
 @socketio.on('join')
@@ -196,37 +186,52 @@ def on_join(data):
     data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     partner = User.query.filter_by(username=data['partner']).first()
+    print(user, partner)
+    # partner isn't in a room, create a new room
     if not partner.room:
-        msg = {'username': user.username, 'success': False, 'room': None}
-        emit('join', msg)
-    room = partner.room
-    msg = {'username': user.username, 'success': True, 'room': room.id}
-    msg = json.dumps(msg)
-    join_room(partner.room)
-    user.room = room
-    db.session.commit()
-    emit('join', msg, room=room)
-
-
-@socketio.on('create')
-def on_create(data):
-    """create a new group"""
-    try:
-        data = json.loads(data)
-        room = Room()
-        db.session.add(room)
+        new_room = Room()
+        db.session.add(new_room)
         db.session.commit()
-        join_room(room)
-        user = User.query.filter_by(username=data['username']).first()
+        peers = [user.username, partner.username]
+        user.room = new_room
+        db.session.commit()
+        join_room(new_room)
+        msg = {'username': user.username, 'room': new_room.id, 'peers':peers}
+        msg = json.dumps(msg)
+        emit('join', msg, broadcast=True)
+    # partner already in a room
+    else:
+        room = partner.room
+        peers = User.query.filter_by(room=room).all()
+        peers=[i.username for i in peers]
+        peers.append(data['username'])
+        msg = {'username': user.username, 'room': room.id, 'peers':peers}
+        msg = json.dumps(msg)
+        join_room(partner.room)
         user.room = room
         db.session.commit()
-        msg = {'username': user.username, 'success': True, 'room': room.id}
-        msg = json.dumps(msg)
-        emit('create', msg)
-    except:
-        msg = {'username': user.username, 'success': False}
-        msg = json.dumps(msg)
-        emit('create', msg)
+        emit('join', msg, room=room)
+
+
+# @socketio.on('create')
+# def on_create(data):
+#     """create a new group"""
+#     try:
+#         data = json.loads(data)
+#         room = Room()
+#         db.session.add(room)
+#         db.session.commit()
+#         join_room(room)
+#         user = User.query.filter_by(username=data['username']).first()
+#         user.room = room
+#         db.session.commit()
+#         msg = {'username': user.username, 'success': True, 'room': room.id}
+#         msg = json.dumps(msg)
+#         emit('create', msg)
+#     except:
+#         msg = {'username': user.username, 'success': False}
+#         msg = json.dumps(msg)
+#         emit('create', msg)
 
 
 @socketio.on('leave')
@@ -235,15 +240,27 @@ def on_leave(data):
     data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     room = user.room
+    msg = {'username': user.username, 'success': True}
+    emit('leave', msg, room=room, include_self=True)
     leave_room(room)
     user.room = None
     db.session.commit()
-    msg = {'username': user.username, 'success': True}
     msg = json.dumps(msg)
-    emit('leave', msg, room=room)
+    print(user.username, "leaving")
 
 
+@socketio.on('logout')
+def on_logout(data):
+    data = json.loads(data)
+    user = User.query.filter_by(username=data['username']).first()
+    msg = {"username": user.username}
+    msg = json.dumps(msg)
+    emit('logout', msg, broadcast=True)
+    user.status = 'logout'
+    db.session.commit()
+    user.room = None
+    db.session.commit()
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, debug=True)
