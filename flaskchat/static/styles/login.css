@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo+Da+2&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    /* text-decoration: none; */
+    box-sizing: border-box;
+    list-style: none;
+    font-family: 'Baloo Da 2', cursive, sans-serif;
+}
+
+input:focus{
+    outline: none;
+}
+
+body{
+    background-color: #6e7a8a;
+}
+
+#main-container{
+    background-color: #e1e7ec;
+    position: absolute;
+    margin-left: 32%;
+    margin-top: 8%;
+    height: 65%;
+    width: 35%;
+    border-radius: 20px 20px 20px 20px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+#main-container
+#main-header{
+    color: #36BDBD;
+    margin-top: 8%;
+    margin-bottom: 5%;
+    text-align: center;
+    font-size: x-large;
+}
+
+#main-container
+#main-header:hover{
+    color: #00B4B4;
+    transition: 0.3s ease-in-out;
+}
+
+#main-container
+#main-content{
+    width: 100%;
+    padding-left: 8%;
+    height: 100%;
+}
+
+#main-container
+#main-content
+.form-label{
+    font-size: larger;
+    font-style: normal;
+    color: #6e7a8a;
+    margin-bottom: 5px;
+}
+
+#main-container
+#main-content
+#login-form
+.user-input{
+    border: none;
+    background-color: #e1e7ec;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    color: #202833;
+    width: 90%;
+    height: 30px;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    font-size: larger;
+}
+
+#main-container
+#main-content
+#login-form
+.user-input:focus{
+    border-bottom: 2px solid #36BDBD;
+    transition: 0.3s ease-in-out;
+}
+
+#main-container
+#main-content
+#login-form
+#user-register
+a{
+    color: #36BDBD;
+}
+
+
+#main-container
+#main-content
+#login-form
+#submit-button{
+    background-color: #00B4B4;
+    border: none;
+    border-radius: 10px;
+    padding: 2% 6%;
+    font-size: larger;
+    color: #e1e7ec;
+    text-align: center;
+    margin-left: 32%;
+    margin-top: 13%;
+}
