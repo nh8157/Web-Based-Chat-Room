@@ -72,7 +72,7 @@ class Peers{
     // }
     peer_join(self, name){
         // display the new user list
-        console.log("here");
+        console.log(name);
         this.group_members.push(name);
         user_display(this.group_members);
         // sends an alert in group chat
@@ -121,22 +121,32 @@ socket.on("send", (msg)=>{
 socket.on("join", (msg)=>{
     const join_msg = JSON.parse(msg);
     const name = join_msg["username"];
-    console.log(join_msg);
-    if (join_msg["peers"].includes(self.get_name()) && !self.get_state()){
-        // self is pulled into a group chat
-        // load users in the array
-        if (name == self.get_name()){
-            peer.self_join_chat(self, join_msg["peers"], join_msg["room"]);
-        } else {
-            console.log(name);
-            const self_msg = JSON.stringify({"username": self.get_name(), "partner": name});
-            socket.emit("join", self_msg);
+    console.log(name);
+    if (join_msg["peers"].includes(self.get_name())){
+        // user pulled into a group chat
+        if (!self.get_state()){
+            if (name == self.get_name()){
+                // self is pulled into a group chat
+                // load users in the array
+                peer.self_join_chat(self, join_msg["peers"], join_msg["room"]);
+            } else {
+                console.log(name);
+                const self_msg = JSON.stringify({"username": self.get_name(), "partner": name});
+                socket.emit("join", self_msg);
+            }
+        } else{
+            if (join_msg["peers"].length == 2){
+                // this is the start of a group chat
+                console.log("joined");
+            } else {
+                // peer joining the group chat
+                peer.peer_join(self, name);
+            }
         }
-    } else if (!self.get_state() && name != self.get_name()){
-        // if this is not self
-        peer.peer_join(self, name);
+    } else if (!self.get_state()){
+        console.log("others joining chat");
     } else {
-        alert("An error occurred when joining the room");
+        console.log("Error");
     }
 })
 socket.on("leave", (leave_msg)=>{

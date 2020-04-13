@@ -16,13 +16,10 @@ def on_users(data):
 
 @socketio.on('send')
 def on_send(data):
-    """Broadcast messages"""
     data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     room = user.room
-    print(room.id)
     msg = {"username": data["username"], "msg": data["msg"]}
-    print(msg)
     msg = json.dumps(msg)
     emit('send', msg, room=room.id, include_self=True)
 
@@ -32,7 +29,6 @@ def on_join(data):
     data = json.loads(data)
     user = User.query.filter_by(username=data['username']).first()
     partner = User.query.filter_by(username=data['partner']).first()
-    print(user, partner)
     if not partner.room:
         new_room = Room()
         db.session.add(new_room)
@@ -40,21 +36,21 @@ def on_join(data):
         peers = [user.username, partner.username]
         user.room = new_room
         db.session.commit()
-        join_room(new_room)
+        join_room(new_room.id)
         msg = {'username': user.username, 'room': new_room.id, 'peers':peers}
         msg = json.dumps(msg)
         emit('join', msg, broadcast=True)
     else:
         room = partner.room
         peers = User.query.filter_by(room=room).all()
-        peers=[i.username for i in peers]
+        peers = [i.username for i in peers]
         peers.append(data['username'])
         msg = {'username': user.username, 'room': room.id, 'peers':peers}
         msg = json.dumps(msg)
-        join_room(partner.room)
+        join_room(partner.room.id)
         user.room = room
         db.session.commit()
-        emit('join', msg, room=room)
+        emit('join', msg, room=room.id)
 
 
 @socketio.on('leave')
@@ -63,14 +59,12 @@ def on_leave(data):
     user = User.query.filter_by(username=data['username']).first()
     room = user.room
     msg = {'username': user.username, 'success': True}
-    # leave works when everything is changed to broadcast
-    emit('leave', msg, broadcast=True)
-    leave_room(room)
+    emit('leave', msg, room=room.id, include_self=True)
+    leave_room(room.id)
     user.room = None
     db.session.commit()
     msg = json.dumps(msg)
-    print(user.username, "leaving")
-
+    
 
 @socketio.on('logout')
 def on_logout(data):
