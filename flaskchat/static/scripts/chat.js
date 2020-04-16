@@ -36,12 +36,15 @@ class Peers{
     constructor(){
         this.group_members = [];
         this.room = false;
+        this.time = 0;
     }
     self_join_system(self, msg){
         // send requests to server
         // load the users into the array
         this.group_members = array_remove(msg)
-        console.log(this.group_members);
+        const display = document.getElementById("chat-display");
+        display.innerHTML = "";
+        header_display(self, this);
         user_display(this.group_members);
         user_click(self, this);
     }
@@ -56,6 +59,7 @@ class Peers{
         const leave = document.getElementById("leave-header");
         leave.innerHTML = "Leave Chat";
         // display the users on the sidebar
+        header_display(self, this);
         user_display(this.group_members);
         // reassign click object to array objects
         user_click(self, this);
@@ -72,7 +76,6 @@ class Peers{
     // }
     peer_join(self, name){
         // display the new user list
-        console.log(name);
         this.group_members.push(name);
         user_display(this.group_members);
         // sends an alert in group chat
@@ -81,10 +84,18 @@ class Peers{
     }
     peer_leave(self, name){
         this.group_members = array_remove(this.group_members, name);
-        console.log(this.group_members);
         user_display(this.group_members);
         user_click(self, this);
         notice_display(name, false);
+    }
+    get_id(){
+        return this.room;
+    }
+    get_time(){
+        return this.time;
+    }
+    update_time(min){
+        this.time = min;
     }
 }
 
@@ -112,7 +123,12 @@ socket.on("users", (msg)=>{
 // receiving messages from the server
 socket.on("send", (msg)=>{
     const new_msg = JSON.parse(msg);
-    console.log(new_msg);
+    const time = new Date();
+    const min = time.getMinutes();
+    if (!peer.get_time() || (min - peer.get_time()) > 2){
+        notice_display();
+        peer.update_time(min);
+    }
     const name = new_msg["username"];
     const user_msg = new_msg["msg"];
     msg_display(name, user_msg);
@@ -121,7 +137,6 @@ socket.on("send", (msg)=>{
 socket.on("join", (msg)=>{
     const join_msg = JSON.parse(msg);
     const name = join_msg["username"];
-    console.log(name);
     if (join_msg["peers"].includes(self.get_name())){
         // user pulled into a group chat
         if (!self.get_state()){
@@ -130,7 +145,6 @@ socket.on("join", (msg)=>{
                 // load users in the array
                 peer.self_join_chat(self, join_msg["peers"], join_msg["room"]);
             } else {
-                console.log(name);
                 const self_msg = JSON.stringify({"username": self.get_name(), "partner": name});
                 socket.emit("join", self_msg);
             }
@@ -165,12 +179,12 @@ socket.on("leave", (leave_msg)=>{
 socket.on("logout", (msg)=>{
     const logout_msg = JSON.parse(msg);
     const name = logout_msg["username"];
-    console.log(name);
-    if (name == self.get_name()){
-        window.location.href = "/logout";
-    } else if (self.get_state() == false){
-        peer.peer_leave(self, name);
-        console.log(name, "is logging out");
+    if (!self.get_state()){
+        if (name == self.get_name()){
+            window.location.href = "/logout";
+        } else {
+            peer.peer_leave(self, name);
+        }
     }
 })
 
@@ -189,7 +203,6 @@ sendbtn.onclick = function (){
             setTimeout(function(){
                 chatbox.placeholder = "Say something";
             }, 2000);
-            console.log("emptymessage");
         }else{
             // display only available after server echo
             chatbox.value = "";
@@ -208,9 +221,7 @@ sendbtn.onclick = function (){
 
 document.getElementById("leave-header").onclick = function (){
     const self_msg = JSON.stringify({"username": self.get_name()});
-    console.log("clicked");
     if (self.get_state()){
-        console.log("leaving");
         socket.emit("leave", self_msg);
     } else {
         socket.emit("logout", self_msg);
@@ -223,10 +234,20 @@ function msg_display(username, msg){
     // determine if the sender is self
     // user is a class object
     const display = document.getElementById("chat-display");
-    const scrollbar = document.getElementById("main-content");
     const msg_class = username == self.get_name() ? "self":"other";
     display.innerHTML += `<p class="${msg_class}-message">${msg}</p><h4 class="${msg_class}-name">${username}</h4><br>`;
+    const scrollbar = document.getElementById("main-content");
     scrollbar.scrollTop = scrollbar.scrollHeight;
+}
+
+function header_display(self, peer){
+    const header = document.getElementById("group-header");
+    if (self.get_state()){
+        // change the header to the number of the group chat
+        header.innerHTML = `Group ${peer.get_id()}`;
+    } else {
+        header.innerHTML = "Single mode";
+    }
 }
 
 function user_display(users){
@@ -248,7 +269,6 @@ function user_click(self, peer){
             if (!self.get_state()){
                 const self_msg = JSON.stringify({"username": self.get_name(), "partner": sidebar[i].textContent});
                 socket.emit("join", self_msg);
-                console.log(self_msg);
             } else {
                 console.log("in chat");
             }
@@ -272,6 +292,8 @@ function notice_display(user=false, state=0){
         // user joins the group chat
         display.innerHTML += `<h5 class="notice-message">${user} joined the group chat</h5>`;
     }
+    const scrollbar = document.getElementById("main-content");
+    scrollbar.scrollTop = scrollbar.scrollHeight;
 }
 
 function array_remove(arr, value){ 
